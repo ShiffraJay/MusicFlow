@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicFlow</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">🎵</div>
+                <div class="name">MusicFlow</div>
+            </div>
+            <nav class="nav">
+                <a class="nav-item active">Home</a>
+                <a class="nav-item">Search</a>
+                <a class="nav-item">Your Library</a>
+                <div class="nav-section">Library</div>
+                <a class="nav-item">Liked Songs</a>
+                <a class="nav-item">Downloaded</a>
+                <a class="nav-item">Radio</a>
+                <a class="nav-item">Podcasts</a>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="topbar">
+                <div class="search">
+                    <input id="searchInput" placeholder="Search for songs, artists, or albums..." />
+                </div>
+                <div class="actions">
+                    <input id="userId" placeholder="User ID (guest)" />
+                    <button id="recsBtn">Get Recs</button>
+                </div>
+            </header>
+
+            <section class="hero">
+                <div class="hero-text">
+                    <h1>Discover Your <span class="accent">Perfect</span> Sound</h1>
+                    <p>Personalized music recommendations powered by AI.</p>
+                    <button id="startBtn">Start Listening</button>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-title">
+                    <h2>Trending Now</h2>
+                    <span class="badge hot">Hot</span>
+                </div>
+                <div id="trendingGrid" class="grid"></div>
+            </section>
+            <section class="section">
+    <div class="section-title">
+        <h2>Popular Now</h2>
+        <span class="badge fire">🔥</span>
+    </div>
+    <div id="popularGrid" class="grid"></div> <!-- Added Popular grid -->
+</section>
+
+            <section class="section">
+                <div class="section-title">
+                    <h2>For You</h2>
+                </div>
+                <div id="recsGrid" class="grid"></div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="player">
+        <div class="track-info">
+            <div class="cover" id="cover">🎧</div>
+            <div>
+                <div id="nowTitle" class="title">Electric Dreams</div>
+                <div id="nowArtist" class="artist">Synthwave Artist</div>
+            </div>
+        </div>
+        <div class="controls">
+            <button id="prevBtn" class="icon">⏮</button>
+            <button id="playBtn" class="play">▶</button>
+            <button id="nextBtn" class="icon">⏭</button>
+            <div class="progress">
+                <span id="curTime">0:00</span>
+                <input id="seek" type="range" min="0" max="100" value="0" />
+                <span id="dur">0:00</span>
+            </div>
+        </div>
+        <div class="volume">
+            <span>🔊</span>
+            <input id="vol" type="range" min="0" max="100" value="70" />
+        </div>
+    </footer>
+
+    <audio id="audio" preload="none"></audio>
+    <script src="script.js"></script>
+    <script>
+const API = "http://127.0.0.1:5000";
+
+async function createUser() {
+  const userId = document.getElementById('userId').value || 'guest';
+  await fetch(`${API}/user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId })
+  });
+}
+
+async function getRecommendations(userId) {
+  const res = await fetch(`${API}/recommend/hybrid`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, top_n: 8 })
+  });
+  const data = await res.json();
+  renderGrid('recsGrid', data.recommendations);
+}
+
+async function sendFeedback(song, liked) {
+  const userId = document.getElementById('userId').value || 'guest';
+  await fetch(`${API}/feedback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, song, liked })
+  });
+  alert(`${liked ? '👍 Liked' : '👎 Disliked'} ${song}`);
+}
+
+function renderGrid(id, songs) {
+  const grid = document.getElementById(id);
+  grid.innerHTML = songs.map(s => `
+    <div class="card">
+      <img src="${s.image_url}" alt="${s.title}" />
+      <div class="meta">
+        <h4>${s.title}</h4>
+        <p>${s.artist}</p>
+        <audio src="${s.audio_url}" controls></audio>
+        <button onclick="sendFeedback('${s.title}', true)">👍</button>
+        <button onclick="sendFeedback('${s.title}', false)">👎</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function showMetrics() {
+  const res = await fetch(`${API}/metrics`);
+  const data = await res.json();
+  alert(`🎯 Precision@5: ${data["Precision@5"]}\n📈 Recall@5: ${data["Recall@5"]}\n🎵 RMSE: ${data["RMSE"]}`);
+}
+
+recsBtn.addEventListener('click', async () => {
+  const userId = userIdInput.value || 'guest';
+  await createUser();
+  await getRecommendations(userId);
+});
+
+startBtn.addEventListener('click', async () => {
+  const userId = userIdInput.value || 'guest';
+  await createUser();
+  await getRecommendations(userId);
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  loadTrending();
+  setupSearch();
+});
+</script>
+</body>
+</html>

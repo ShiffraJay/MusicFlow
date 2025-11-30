@@ -1,0 +1,46 @@
+:root{--bg:#0f1216;--panel:#171a20;--muted:#8b93a7;--text:#e9eefb;--accent:#7ee787;--accent2:#a78bfa;--card:#1c2027;--card-hover:#242a33}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text)}
+.app{display:grid;grid-template-columns:260px 1fr;grid-template-rows:1fr auto;min-height:100vh}
+.sidebar{background:linear-gradient(180deg,#121521,#0e0f1a 60%);padding:16px 12px}
+.brand{display:flex;align-items:center;gap:10px;padding:8px 12px;margin-bottom:8px}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:#2b2f3b;display:flex;align-items:center;justify-content:center}
+.brand .name{font-weight:700;font-size:20px}
+.nav{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.nav-section{margin:14px 10px 6px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+.nav-item{padding:10px 12px;border-radius:8px;color:#d6dcf5;text-decoration:none;cursor:pointer}
+.nav-item:hover{background:#222736}
+.nav-item.active{background:#6c5ce7;color:white}
+.main{background:#0f1116;padding:16px 20px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:16px}
+.search input{width:520px;max-width:60vw;background:var(--panel);border:1px solid #202431;color:var(--text);padding:12px 14px;border-radius:12px}
+.actions{display:flex;gap:8px}
+.actions input{width:160px;background:var(--panel);border:1px solid #202431;color:var(--text);padding:10px 12px;border-radius:10px}
+.actions button{background:#22c55e;color:#08130a;border:none;padding:10px 14px;border-radius:10px;font-weight:600;cursor:pointer}
+.hero{background:radial-gradient(1200px 400px at 20% 0%,#2b354a,#131720);border:1px solid #202431;border-radius:16px;padding:28px;margin-bottom:18px}
+.hero-text h1{margin:0 0 8px;font-size:38px}
+.accent{color:var(--accent2)}
+.section{margin:18px 0}
+.section-title{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.badge{font-size:12px;padding:2px 8px;border-radius:999px;background:#24313a;color:#86e1ff;border:1px solid #2b3c46}
+.badge.hot{background:#3b2430;color:#ff89a7;border-color:#5a3242}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid #222636;border-radius:14px;padding:12px;transition:.15s ease;cursor:pointer}
+.card:hover{transform:translateY(-2px);background:var(--card-hover)}
+.thumb{width:100%;aspect-ratio:1/1;border-radius:12px;background:#303749;display:flex;align-items:center;justify-content:center;font-size:40px}
+.card .title{margin:10px 4px 2px;font-weight:600}
+.card .sub{margin:0 4px 6px;color:var(--muted);font-size:13px}
+.player{grid-column:1/-1;position:sticky;bottom:0;background:#161a22;border-top:1px solid #1f2432;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;gap:16px}
+.track-info{display:flex;align-items:center;gap:12px}
+.cover{width:44px;height:44px;border-radius:8px;background:#2c3242;display:flex;align-items:center;justify-content:center}
+.controls{display:flex;align-items:center;gap:10px}
+.controls .play{background:#22c55e;border:none;color:#0d1a10;border-radius:999px;width:44px;height:44px;font-size:18px;font-weight:700;cursor:pointer}
+.controls .icon{background:transparent;border:1px solid #2b3242;color:#cbd3ea;border-radius:8px;width:36px;height:36px;cursor:pointer}
+.progress{display:flex;align-items:center;gap:8px;width:480px;max-width:40vw}
+.progress input[type=range]{width:100%}
+.volume{display:flex;align-items:center;gap:8px}
+@media (max-width:980px){.app{grid-template-columns:1fr}.sidebar{display:none}.progress{max-width:50vw}}
+
+
+

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MusicFlow Admin</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .admin{max-width:900px;margin:24px auto;padding:16px;background:#12151d;border:1px solid #1e2432;border-radius:12px}
+    .admin h2{margin:6px 0 12px}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .row input{background:#171b24;border:1px solid #232a3a;color:#e9eefb;padding:8px 10px;border-radius:8px}
+    .row button{background:#22c55e;border:none;color:#0c1510;padding:8px 12px;border-radius:8px;font-weight:600;cursor:pointer}
+    .note{color:#8b93a7;font-size:13px;margin-top:4px}
+  </style>
+  </head>
+  <body>
+    <div class="admin">
+      <h1>MusicFlow Admin</h1>
+
+      <h2>Add / Update Song</h2>
+      <div class="row">
+        <input id="sid" placeholder="id (e.g., s1)" />
+        <input id="stitle" placeholder="title" />
+        <input id="sartist" placeholder="artist" />
+        <input id="sgenre" placeholder="genre" />
+        <input id="stempo" placeholder="tempo" type="number" />
+        <input id="senergy" placeholder="energy (0-1)" type="number" step="0.01" />
+        <input id="smood" placeholder="mood" />
+        <input id="simage" placeholder="image_url (optional)" />
+        <input id="saudio" placeholder="audio_url (optional)" />
+        <button onclick="addSong()">Save Song</button>
+      </div>
+
+      <h2>Add Rating</h2>
+      <div class="row">
+        <input id="ruid" placeholder="user id" />
+        <input id="rsid" placeholder="song id" />
+        <input id="rr" type="number" placeholder="rating 1-5" min="1" max="5" />
+        <button onclick="addRating()">Add Rating</button>
+      </div>
+      <div class="note">Ratings feed the collaborative filtering model.</div>
+
+      <h2>Retrain Model</h2>
+      <div class="row">
+        <button onclick="retrain()">Retrain CF (SVD)</button>
+        <span id="status" class="note"></span>
+      </div>
+
+      <h2>Upload MP3</h2>
+      <div class="row">
+        <input id="file" type="file" accept="audio/*" />
+        <button onclick="upload()">Upload</button>
+      </div>
+    </div>
+
+    <script>
+      const base = 'http://127.0.0.1:5000';
+      async function addSong(){
+        const body = {
+          id: sid.value, title: stitle.value, artist: sartist.value,
+          genre: sgenre.value || null, tempo: stempo.value ? Number(stempo.value) : null,
+          energy: senergy.value ? Number(senergy.value) : null, mood: smood.value || null,
+          image_url: simage.value || null, audio_url: saudio.value || null
+        };
+        const r = await fetch(base + '/songs',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        status.textContent = r.ok ? 'Song saved' : 'Failed';
+      }
+      async function addRating(){
+        const body = { user_id: ruid.value, song_id: rsid.value, rating: Number(rr.value) };
+        const r = await fetch(base + '/ratings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+        status.textContent = r.ok ? 'Rating added' : 'Failed';
+      }
+      async function retrain(){
+        status.textContent = 'Training...';
+        const r = await fetch(base + '/admin/retrain',{method:'POST'});
+        status.textContent = r.ok ? 'Model retrained' : 'Failed';
+      }
+      async function upload(){
+        const f = document.getElementById('file').files[0];
+        if(!f){ status.textContent = 'Pick a file first'; return; }
+        const fd = new FormData();
+        fd.append('file', f);
+        const r = await fetch(base + '/media/upload', { method:'POST', body: fd });
+        const j = await r.json();
+        if(r.ok){ saudio.value = j.url; status.textContent = 'Uploaded. audio_url set.'; } else { status.textContent = 'Upload failed'; }
+      }
+    </script>
+  </body>
+</html>
+
+
+
